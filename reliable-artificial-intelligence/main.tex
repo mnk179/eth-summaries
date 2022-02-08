@@ -19,7 +19,10 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage{bbm}
 \usepackage{listings}
+\usepackage{amsmath}
 
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \setdefaultleftmargin{0.5cm}{}{}{}{}{}
 
@@ -67,7 +70,7 @@ Yannick Merkli,~page~\thepage~of~2
 \makeatother
 \setlength{\parindent}{0pt}
 
-\newcommand{\mhl}[1]{\setlength{\fboxsep}{0pt}\colorbox{yellow}{#1}}
+\newcommand{\mhl}[1]{\setlength{\fboxsep}{0pt}{#1}}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand\iid{\stackrel{\mathclap{\normalfont\mbox{\tiny{iid}}}}{=}}
 \lstset{
@@ -113,11 +116,11 @@ CDF: \mbox{\fontsize{8.5}{6}\selectfont $\Phi(v;\mu,\sigma^2) = \int_{-\infty}^{
 
 \textbf{Line through 2 points:} $(a, f(a)), (b, f(b))$,
 
-$a < b$: \mhl{$l(x) = \frac{f(b) - f(a)}{b - a} \cdot x + f(a) - \frac{f(b) - f(a)}{b - a} \cdot a$}
+$a < b$: $l(x) = \frac{f(b) - f(a)}{b - a} \cdot x + f(a) - \frac{f(b) - f(a)}{b - a} \cdot a$
 
 \textbf{Tangent at $(t, f(t))$:}
 
-\mhl{$t(x) = f'(t) \cdot x + f(t) - f'(t) \cdot t$}
+$t(x) = f'(t) \cdot x + f(t) - f'(t) \cdot t$
 
 \textbf{Subadditivity of $\sqrt{\cdot}$:} $\sqrt{x + y} \leq \sqrt{x} + \sqrt{y}$
 
@@ -125,7 +128,7 @@ $a < b$: \mhl{$l(x) = \frac{f(b) - f(a)}{b - a} \cdot x + f(a) - \frac{f(b) - f(
 
 \subsection{Abstract Interpretation}
 
-Symbolic shape $z$ semantically represents a set of concrete values $x = \gamma(z)$. \mhl{Concretization $\gamma$}: defines the concrete values an abstract element $z$ represents. Concrete transformer $F(\cdot)$ ($F(x)$ generally uncomputable), abstract transformer $F^\#(\cdot)$, $F^\#(z)$ applies abstract transformer to $z$. Soundness: $F^\#$ needs to over-approximate $F$: \hl{$\gamma(F^\#(z)) \supseteq F(x) = F(\gamma(z))$}
+Symbolic shape $z$ semantically represents a set of concrete values $x = \gamma(z)$. Concretization $\gamma$: defines the concrete values an abstract element $z$ represents. Concrete transformer $F(\cdot)$ ($F(x)$ generally uncomputable), abstract transformer $F^\#(\cdot)$, $F^\#(z)$ applies abstract transformer to $z$. Soundness: $F^\#$ needs to over-approximate $F$: {$\gamma(F^\#(z)) \supseteq F(x) = F(\gamma(z))$}
 
 $F^\#$ soundness: $\forall z: F(\gamma(z)) \subseteq \gamma(F^\#(z))$
 
@@ -135,9 +138,9 @@ $F_{best}^\#$ optimality: $\forall z: \gamma(F^\#(z)) \not\subset \gamma(F_{best
 
 \section{Adversarial Attacks}
 	
-\textbf{T-FGSM:} \mhl{$x' = x \textcolor{red}{-} \eta$, $\eta =\epsilon \cdot sign(\nabla_x loss_{\textcolor{red}{t}} (x))$}
+\textbf{T-FGSM:} $x' = x \textcolor{red}{-} \eta$, $\eta =\epsilon \cdot sign(\nabla_x loss_{\textcolor{red}{t}} (x))$
 
-\textbf{U-FGSM:} \mhl{$x' = x \textcolor{darkgreen}{+} \eta$, $\eta = \epsilon \cdot sign(\nabla_x loss_{\textcolor{darkgreen}{s}} (x))$}
+\textbf{U-FGSM:} $x' = x \textcolor{darkgreen}{+} \eta$, $\eta = \epsilon \cdot sign(\nabla_x loss_{\textcolor{darkgreen}{s}} (x))$
 
 Guarantees $\eta \in [x-\epsilon, x+\epsilon]$, $\eta$ not minimized.
 
@@ -145,14 +148,14 @@ Guarantees $\eta \in [x-\epsilon, x+\epsilon]$, $\eta$ not minimized.
 
 \textbf{C\&W:} Find adv sample $x' = x + \eta \in [0,1]^n$ \textit{and} minimize $||\eta||_p$ via relaxation s.t. $f(x') = t$.\\
 $obj_t$: $obj_t(x+\eta) \leq 0 \Leftrightarrow f(x+\eta) = t$.\\
-Minim. \mbox{\hl{$||\eta||_p + c \cdot obj_t(x+\eta)$ s.t. $x+\eta \in [0,1]^n$}}
+Minim. \mbox{{$||\eta||_p + c \cdot obj_t(x+\eta)$ s.t. $x+\eta \in [0,1]^n$}}
 
 
 E.g. {\fontsize{9.5}{6}\selectfont \mbox{$obj_t = \{ CE(x', t) - 1; max(0, 0.5 - p_f(x')_t)\}$}}
 
 $\nabla_\eta ||\eta||_p$ is suboptimal $\rightarrow$ use proxy 
 
-$l_\infty$: proxy \mhl{$L(\eta) = \sum_i max(0, |\eta_i| - \tau)$}. Iteratively decrease $\tau$ until $L(\eta)>0$. Then do GD on $\eta$: $\eta = \eta - \gamma \nabla_\eta(L(\eta) + c \cdot obj_t(x+\eta))$ until $L(\eta) = 0$, then anneal $\tau$ and continue loop.
+$l_\infty$: proxy $L(\eta) = \sum_i max(0, |\eta_i| - \tau)$. Iteratively decrease $\tau$ until $L(\eta)>0$. Then do GD on $\eta$: $\eta = \eta - \gamma \nabla_\eta(L(\eta) + c \cdot obj_t(x+\eta))$ until $L(\eta) = 0$, then anneal $\tau$ and continue loop.
 
 Constraint $\eta_i \in [-x_i,1-x_i]$: LBFGS-B, PGD
 
@@ -176,7 +179,7 @@ while($class(f_1(x)) = class(f_2(x))$):
 \section{Adversarial Defenses}
 
 \textbf{Defense as Optimization:} $\min_\theta \rho(\theta)$,
- \colorbox{yellow}{$\rho(\theta) = \mathbb{E}_{(x,y) \sim D} \left[ \max_{\textcolor{red}{x' \in S(x)}} L(\theta, \textcolor{red}{x'}, y) \right]$},\\
+ {$\rho(\theta) = \mathbb{E}_{(x,y) \sim D} \left[ \max_{\textcolor{red}{x' \in S(x)}} L(\theta, \textcolor{red}{x'}, y) \right]$},\\
 $S(x) = \{ x': ||x - x'||_\infty \leq \epsilon \}$
 
 \textbf{PGD Defense in practice:}\\
@@ -192,12 +195,12 @@ $\min\limits_\theta \mathbb{E}_{(x,y) \sim D} [L(\theta, x, y) + \lambda \max\li
 
 \section{Certification of Neural Networks}
 
-Given NN N, pre-condition $\phi$, post-condition $\psi$ prove: \hl{$\forall i \in I: i \vDash \phi \implies N(i) \vDash \psi$} or return a \textcolor{red}{violation}.
+Given NN N, pre-condition $\phi$, post-condition $\psi$ prove: {$\forall i \in I: i \vDash \phi \implies N(i) \vDash \psi$} or return a \textcolor{red}{violation}.
 \subsection{Incomplete Methods:}
 
 Over-approx. $\phi$ using relaxation, then push approx. through NN via bound propagation.
 
-\textbf{Box:} \hl{$\hat{x_i} = [l,u]$}, i.e. \mhl{$l \leq x_i \leq u$}. \qquad
+\textbf{Box:} {$\hat{x_i} = [l,u]$}, i.e. \mhl{$l \leq x_i \leq u$}. \qquad
 $AT^\#$: $[a,b] +^\#[c,d] = [a+b, c+d]$;
 $-^\#[a,b] = [-b,-a]$;
 
@@ -205,18 +208,18 @@ $ReLU^\#[a,b] = [ReLU(a), ReLU(b)]$;
 
 $\lambda \cdot^\# [a,b] = [\lambda a, \lambda b]$ ($\lambda > 0$)
 
-\textbf{Zonotope:}  \hl{$\hat{x_j} = a_0^j + \sum_{i=1}^{k} a_i^j \epsilon_i, \forall j \in [d]$ $\epsilon_i \in [-1, 1]$} shared among $d$ abstract neurons. $[\hat{x_1},..,\hat{x_d}]$ describes Zonotope $\mathcal{Z}$ centered at $\vec{a}_0 = [a_0^1,..,a_0^d]$.
+\textbf{Zonotope:}  {$\hat{x_j} = a_0^j + \sum_{i=1}^{k} a_i^j \epsilon_i, \forall j \in [d]$ $\epsilon_i \in [-1, 1]$} shared among $d$ abstract neurons. $[\hat{x_1},..,\hat{x_d}]$ describes Zonotope $\mathcal{Z}$ centered at $\vec{a}_0 = [a_0^1,..,a_0^d]$.
 
-Centering: Flip $X \in \mathcal{Z}$ around $\vec{a}_0$ to \hl{flipped point $Y = 2\vec{a}_0 - X$}. $Y \in \mathcal{Z}$ and $|X-\vec{a}_0| = |Y - \vec{a}_0|$. $\mathcal{Z}$ is point-symmetric around $\vec{a}_0$.
+Centering: Flip $X \in \mathcal{Z}$ around $\vec{a}_0$ to {flipped point $Y = 2\vec{a}_0 - X$}. $Y \in \mathcal{Z}$ and $|X-\vec{a}_0| = |Y - \vec{a}_0|$. $\mathcal{Z}$ is point-symmetric around $\vec{a}_0$.
 
 $AT^\#$: Affine$^\#$ is exact\\
 - Affine$^\#$: $(a_0^p + \sum_{i=1}^{k} a_i^p \epsilon_i) + (a_0^q + \sum_{i=1}^{k} a_i^q \epsilon_i) = (a_0^p + a_0^q) + \sum_{i=1}^{k} (a_i^p + a_i^q) \epsilon_i$
 
 $C \cdot (a_0^p + \sum_{i=1}^{k} a_i^p \epsilon_i) = C \cdot a_0^p + \sum_{i=1}^{k} C \cdot a_i^p \epsilon_i$
 
-- ReLU$^\#(\hat{x})$: \textbf{1)} Box bounds \mhl{$\hat{x}$}$ = a_0 + \sum_{i=1}^{k} a_i\epsilon_i$ \mhl{$\in [l_x,u_x]$}. $\mathbf{l_x}$: $\epsilon_i = -1$ if $a_i \geq 0$, $\epsilon_i = +1$ if $a_i < 0$. $\mathbf{u_x}$: $\epsilon_i = +1$ if $a_i \geq 0$, $\epsilon_i = -1$ if $a_i < 0$.
+- ReLU$^\#(\hat{x})$: \textbf{1)} Box bounds $\hat{x}$$ = a_0 + \sum_{i=1}^{k} a_i\epsilon_i$ $\in [l_x,u_x]$. $\mathbf{l_x}$: $\epsilon_i = -1$ if $a_i \geq 0$, $\epsilon_i = +1$ if $a_i < 0$. $\mathbf{u_x}$: $\epsilon_i = +1$ if $a_i \geq 0$, $\epsilon_i = -1$ if $a_i < 0$.
 
-\textbf{2)} \mhl{$u_x \leq 0$}: $\hat{y} = 0$; \mhl{$l_x > 0$}: $\hat{y} = \hat{x}$; \mhl{$l_x < 0, u_x > 0$}:
+\textbf{2)} $u_x \leq 0$: $\hat{y} = 0$; $l_x > 0$: $\hat{y} = \hat{x}$; $l_x < 0, u_x > 0$:
 
 $\hat{y}(\hat{x}) = b_0 + \sum_{i=1}^{k\textcolor{red}{+1}} b_i \epsilon_i$, $b_0 = \lambda(a_0 - l_x/2)$, $b_i = \lambda a_i, \forall i \in [1,k]$, $b_{k+1} = -\lambda l_x / 2$,
 
@@ -231,23 +234,23 @@ Note: there are many non-comparable ReLU abstract transformers for Zonotope. The
 
 \begin{compactitem}\labelwidth=4em
 	\item \textcolor{blue}{interval constraints} $l_i \leq x_i$, $x_i \leq u_i$
-	\item \textcolor{darkgreen}{relational constraints}: $a_i^\leq \leq x_i$, $x_i \leq a_i^\geq$ where $a_i^\leq, a_i^\geq$ are of the form \mhl{$\sum_j w_j \cdot x_j + \nu$}
+	\item \textcolor{darkgreen}{relational constraints}: $a_i^\leq \leq x_i$, $x_i \leq a_i^\geq$ where $a_i^\leq, a_i^\geq$ are of the form $\sum_j w_j \cdot x_j + \nu$
 \end{compactitem}
 \vspace*{1mm}
 
 $AT^\#$: Affine$^\#$ is exact\\
 -Affine$^\#$: \textcolor{darkgreen}{rel}: $\sum_j w_j^p \cdot x_j + \nu^p + \sum_j w_j^q \cdot x_j + \nu^q = \sum_j (w_j^p + w_j^q) \cdot x_j + (\nu^p + \nu^q)$;
 
-\textcolor{blue}{int}: \mhl{backsubstitution} up to some layer. Then replace neurons of that layer with its correct \textcolor{blue}{interval constraint} (like in Zonotope Box bounds).
+\textcolor{blue}{int}: backsubstitution up to some layer. Then replace neurons of that layer with its correct \textcolor{blue}{interval constraint} (like in Zonotope Box bounds).
 
 \textcolor{red}{Backsub: sum up all components!}
 
 - $x_j =$ ReLU$^\#(x_i)$: \textcolor{blue}{interval constr.} $x_i \in [l_i, u_i]$:
-\hl{$u_i \leq 0$:} $a_j^\leq = a_j^\geq = 0, l_j = u_j = 0$;
+{$u_i \leq 0$:} $a_j^\leq = a_j^\geq = 0, l_j = u_j = 0$;
 
-\hl{$l_i \geq 0$:} $a_j^\leq = a_j^\geq = x_i, l_j = l_i, u_j = u_i$;
+{$l_i \geq 0$:} $a_j^\leq = a_j^\geq = x_i, l_j = l_i, u_j = u_i$;
 
-\hl{$l_i < 0, u_i > 0$:} $\lambda = u_i / (u_i - l_i)$,
+{$l_i < 0, u_i > 0$:} $\lambda = u_i / (u_i - l_i)$,
 
 $\mathbf{u_i \leq - l_i:}$
 $a_j^\leq = 0$, $a_j^\geq = \lambda x_i - \lambda l_i$, $x_j \in [0, u_i]$;
@@ -261,8 +264,8 @@ $\mathbf{u_i > - l_i:}$ $a_j^\leq = x_i$, $a_j^\geq = \lambda x_i - \lambda l_i$
 
 Encode NN as MILP instance.\\
 - Affine: $y = Wx+b$ direct MILP constraint.\\
-- $ReLU(x)$: \mbox{\fontsize{9.7}{6}\selectfont \hl{$y \leq x - l_x \cdot (1-a)$, $y \geq x$, $y \leq u_x \cdot a$,}}\\
-\hl{$y \geq 0$, $a \in \{0,1\}$, for neuron bound $x \in [l,u]$.}\\
+- $ReLU(x)$: \mbox{\fontsize{9.7}{6}\selectfont {$y \leq x - l_x \cdot (1-a)$, $y \geq x$, $y \leq u_x \cdot a$,}}\\
+{$y \geq 0$, $a \in \{0,1\}$, for neuron bound $x \in [l,u]$.}\\
 \vspace*{-3mm}
 \begin{compactitem}\labelwidth=4em
 	\item $a = 0$: $y = 0, x \in [l,0]$
@@ -279,16 +282,16 @@ Encode NN as MILP instance.\\
 \subsection{DiffAI}
 \textbf{DiffAI} Certified PGD Defense: minimize 
 
-\mhl{$\rho(\theta) = \mathbb{E}_{(x,y) \sim D} \big[ \max\limits_{\textcolor{red}{z \in \gamma(NN^\#(S(x)))}} L(\theta, \textcolor{red}{z}, y) \big]$}
+$\rho(\theta) = \mathbb{E}_{(x,y) \sim D} \big[ \max\limits_{\textcolor{red}{z \in \gamma(NN^\#(S(x)))}} L(\theta, \textcolor{red}{z}, y) \big]$
 
-Find output $z$ in concretization $\gamma(NN^\#(S(x)))$ of abstract NN output $NN^\#(S(x))$ that maximizes loss $L$. Can use any abstract transformer (Box, Zonotope, DeepPoly,...). \hl{Essentially automatic differentiation of abstract interpretation.}
+Find output $z$ in concretization $\gamma(NN^\#(S(x)))$ of abstract NN output $NN^\#(S(x))$ that maximizes loss $L$. Can use any abstract transformer (Box, Zonotope, DeepPoly,...). {Essentially automatic differentiation of abstract interpretation.}
 
 To find max loss, use abstract loss $L^\#(\vec{z}, y)$, where $y = $ target label, $\vec{z} = $ vector of logits:
 \vspace*{1mm}
 
-- $L(z, y) = max_{q \neq y} (z_q - z_y)$: Compute \hl{$d_c = z_c - z_y \forall c \in \mathcal{C}$} where $\mathcal{C}$ set of classes and $z_c$ the abstract logit shape of class $i$. Then compute box bounds of $d_c$ and compute max upper bound: \hl{$\max_{c \in \mathcal{C}}(\max(box(d_c)))$}
+- $L(z, y) = max_{q \neq y} (z_q - z_y)$: Compute {$d_c = z_c - z_y \forall c \in \mathcal{C}$} where $\mathcal{C}$ set of classes and $z_c$ the abstract logit shape of class $i$. Then compute box bounds of $d_c$ and compute max upper bound: {$\max_{c \in \mathcal{C}}(\max(box(d_c)))$}
 
-- $L(z,y) = CE(z,y)$: Compute box bounds $[l_c, u_c]$ of logit shapes $z_c$. $\forall c \in \mathcal{C}$ pick $u_c$ if $c \neq y$, pick $l_c$ if $c = y$. Then \hl{apply softmax to vector $v = [u_0, u_1,.., l_c,.., u_{|\mathcal{C}|}]$ and compute $CE(v', y)$ with $v' = softmax(v)$.}
+- $L(z,y) = CE(z,y)$: Compute box bounds $[l_c, u_c]$ of logit shapes $z_c$. $\forall c \in \mathcal{C}$ pick $u_c$ if $c \neq y$, pick $l_c$ if $c = y$. Then {apply softmax to vector $v = [u_0, u_1,.., l_c,.., u_{|\mathcal{C}|}]$ and compute $CE(v', y)$ with $v' = softmax(v)$.}
 
 Cheap relaxations (box) scale but introduce lots of infeasible points: substantial drop in standard accuracy.
 BUT, more precise relaxations (Zonotope) do not actually bring better results in provabililty. Hypothesis: more complex abstractions lead to more difficult optimization problems. $\rightarrow$ bridge the gap between adversarial training and certified defenses..
@@ -297,7 +300,7 @@ BUT, more precise relaxations (Zonotope) do not actually bring better results in
 \subsection{COLT}
 \textbf{COLT:} PGD training with intermediate NN layer shapes $S_i$. Iterate over layers $h_i$ and find weights $\theta$ for layers $h_{i+1},..,h_D$ that minimize the worst-case loss of $x_i \in S_i$. Weights of previous layers $h_1,..,h_{i}$ are frozen.
 
-\colorbox{yellow}{$\min\limits_\theta \max\limits_{x_i \in S_i} L(h_D(h_{D-1}(... h_{i+1}(x_i))), y_{true})$}
+{$\min\limits_\theta \max\limits_{x_i \in S_i} L(h_D(h_{D-1}(... h_{i+1}(x_i))), y_{true})$}
 
 The inner maximization requires projections: projections on Zonotope solved via projection on Box (via change of variables):
 
@@ -321,7 +324,7 @@ $I(x,y) = p_{x_1,y_1} (x_2 - x)(y_2 - y)\\ + p_{x_1,y_2}(x_2 - x)(y - y_1) + p_{
 $y_1 \leq y \leq y_2$ and $x_2 = x_1 + 1, y_2 = y_1 + 1$
 \vspace*{1mm}
 
-Pixel value $(x,y)$ after $T_\kappa$ given by $I_\kappa : \mathbb{R}^2 \rightarrow \mathbb{R}$, where \mhl{$I_\kappa(x,y) = I \circ T_\kappa^{-1}(x,y)$}
+Pixel value $(x,y)$ after $T_\kappa$ given by $I_\kappa : \mathbb{R}^2 \rightarrow \mathbb{R}$, where $I_\kappa(x,y) = I \circ T_\kappa^{-1}(x,y)$
 
 \subsection{Certifying geometric robustness}
 
@@ -341,11 +344,11 @@ $U(\mathbf{w_u}, b_u) = \int_{\kappa \in D} (\mathbf{w_u^T \kappa} + b_u) - I_\k
 
 subject to finite set of constraints (LP solve)
 
-\hl{$\mathbf{w_l^T \kappa^i} + b_l \leq I_{\kappa^i}(x,y) \leq \mathbf{w_u^T \kappa^i} + b_u, \forall i \in {1,..,N}$}
+{$\mathbf{w_l^T \kappa^i} + b_l \leq I_{\kappa^i}(x,y) \leq \mathbf{w_u^T \kappa^i} + b_u, \forall i \in {1,..,N}$}
 
 $\rightarrow$ can obtain over-approximations $\hat{w}_l, \hat{b}_l, \hat{w}_u, \hat{b}_u$
 
-\textcolor{red}{Problem:} This is only sound at the finite sample points $\kappa_i$. Instead, \hl{find upper bounds $\delta_l, \delta_u$ on the maximum soundness violation on entire $D$}:
+\textcolor{red}{Problem:} This is only sound at the finite sample points $\kappa_i$. Instead, {find upper bounds $\delta_l, \delta_u$ on the maximum soundness violation on entire $D$}:
 
 lb: $(\mathbf{\hat{w}_l^T \kappa} + \hat{b}_l) - I_\kappa(x,y) \leq \delta_l, \forall \kappa \in D$
 
@@ -353,8 +356,8 @@ ub: $I_\kappa(x,y) - (\mathbf{\hat{w}_u^T \kappa} + \hat{b}_u) \leq \delta_u, \f
 
 (Intuition: if $(\mathbf{\hat{w}_l^T \kappa} + \hat{b}_l)$ is unsound, then $\exists \kappa: \mathbf{\hat{w}_l^T \kappa} + \hat{b}_l > I_\kappa(x,y)$, similarly for ub)
 
-Then, constraints \mhl{$\mathbf{w}_l = \mathbf{\hat{w}}_l, b_l = \hat{b}_l - \delta_l$},\\
-\mhl{$\mathbf{w_u} = \mathbf{\hat{w}_u}, b_u = \hat{b}_u + \delta_u$} are sound.
+Then, constraints $\mathbf{w}_l = \mathbf{\hat{w}}_l, b_l = \hat{b}_l - \delta_l$,\\
+$\mathbf{w_u} = \mathbf{\hat{w}_u}, b_u = \hat{b}_u + \delta_u$ are sound.
 
 
 \textbf{Bounding max. violation:} compute upper bounds on $f_l(\kappa) = (\mathbf{\hat{w}_l^T \kappa} + \hat{b}_l) - I_\kappa(x,y)$,
@@ -366,10 +369,10 @@ $f_u(\kappa) = I_\kappa(x,y) - (\mathbf{\hat{w}_u^T \kappa} + \hat{b}_u)$
 
 \item Mean-value theorem, Lipschitz continuity:
 
-\hspace*{-5mm} \hl{$f(\kappa)$}=$f(\kappa_c) + \nabla f(\kappa')^T (\kappa - \kappa_c) \leq
+\hspace*{-5mm} {$f(\kappa)$}=$f(\kappa_c) + \nabla f(\kappa')^T (\kappa - \kappa_c) \leq
 f(\kappa_c) + $
 
-\hspace*{-5mm} $|L|^T (\kappa - \kappa_c)$ \hl{$\leq f(\frac{1}{2} (h_u + h_l)) + \frac{1}{2}|L|^T(h_u - h_l)$}
+\hspace*{-5mm} $|L|^T (\kappa - \kappa_c)$ {$\leq f(\frac{1}{2} (h_u + h_l)) + \frac{1}{2}|L|^T(h_u - h_l)$}
 
 \vspace*{1mm}
 with $|\partial_i f(\kappa')| \leq |L_i|, \forall \kappa' \in D$, $D = [h_l, h_u]$.
@@ -381,54 +384,6 @@ Bound $L$ on $\nabla f(\kappa')$? propagate hyper-rectangle $D$ through partial 
 In practice: branch $D$ into multiple hyper-rectangles and bound each separately.
 
 
-\section{Visualization}
-
-Image similarity: neuron activation $R(x)$, if $||R(x_1) - R(x_2)||_2$ is small, then images $x_1, x_2$ are similar.
-
-\subsection{Feature Visualization}
-Invert NN, show parts of input causing high activation. Generally, deeper layers encode more complex patterns.
-\vspace*{1mm}
-
-\textbf{Feature Visualization by Optimization}: Find input $x$ that maximizes mean activation of a neuron/channel/layer while minimizing regularizers $R_i(x)$ (regularizers are crucial).
-
-Maximize: $score(x) - \sum_i \lambda_i R_i(x)$ where $score(x) = mean(layer_n [ x,y,z ])$
-
-\vspace*{1mm}
-\subsection{Feature Attribution}
-
-Find areas of input that are responsible for classification.
-
-\textbf{Gradient based:} $\frac{\partial logit_i (x)}{\partial x}$
-
-shows how changing single pixel influences logit.
-
-\vspace*{1mm}
-\textbf{Shapley Values:} input $\mathbf{x}$ has feature set $P$. How much does $i \in P$ contribute to $f(P)$?
-
-\mhl{$C_i = \hspace*{-2mm} \sum\limits_{S \subseteq P \backslash \{ i \}} \frac{|S|! \cdot (|P| - |S| - 1)! }{|P|!} \big[f(S \cup \{i\}) - f(S) \big]$}
-
-%( $\rightarrow$ sum over all subsets $S$ of $P \backslash \{i\}$)
-
-\vspace*{1mm}
-Treat each pixel location as feature, instantiate $f$ with logit of target class. Pixel not contained in $S$ are set to a baseline value (zero, mean,..)
-
-$\sum_i C_i = f(x) - f(S = \emptyset)$
-
-\vspace*{1mm}
-\textbf{Combining Visualization \& Attribution:}
-
-1) Compute activations in a conv layer
-2) Cluster actications into $k$ groups
-3) For each group: 1. show which pixel affect if most by upscaling the activation maps (grouped activations) 2. show a visualization for the group of features.
-
-\vspace*{1mm}
-\subsection{Visualization and Adversarial Examples}
-
-On non-robust NN, gradient based attribution requires prior to enforce a \textit{clean} saliency map.
-On robust NN, gradient is better aligned with human expectation (since features are better aligned).
-
-$\rightarrow$ robust NN rely on different features (better aligned with human perception). Non-robust NN learn non-robust spurious features in the data that statistically are only weakly connected with the input.
-
 \section{Logic and Deep Learning (DL2)}
 
 \subsection{Querying Neural Networks}
@@ -439,7 +394,7 @@ $(class(NN(i)) = 9) = \hspace*{-4mm} \bigwedge\limits_{j=1,j \neq 9}^k \hspace*{
 
 Use translation $T$ of logical formulas into differentiable loss function $T(\phi)$ to be solved with gradient-based optimization to minimize $T(\phi)$.
 
-\textbf{Theorem}: \mhl{$\forall x, T(\phi)(x) = 0 \Longleftrightarrow x \vDash \phi$}
+\textbf{Theorem}: $\forall x, T(\phi)(x) = 0 \Longleftrightarrow x \vDash \phi$
 
 \vspace*{1mm}
 \textbf{Logical Formula to Loss:}
@@ -489,9 +444,9 @@ BUT: Universal quantifiers are difficult.
 
 \textbf{Reformulation:} get the worst violation of $\phi$ and find $\theta$ that minimizes its effect.
 
-minimize \hl{$\rho(\theta) = \mathbb{E}_{s \sim D} \big[ T(\phi)(z_{worst}, s, \theta) \big]$}
+minimize {$\rho(\theta) = \mathbb{E}_{s \sim D} \big[ T(\phi)(z_{worst}, s, \theta) \big]$}
 
-where \hl{$z_{worst} = \arg \min_z T(\lnot \phi)(z, s, \theta)$}
+where {$z_{worst} = \arg \min_z T(\lnot \phi)(z, s, \theta)$}
 
 In practice, restrict $z$ to a convex set with efficient projections (closed form). One can then remove the constraint from $\phi$ that restricts $z$ on the convex set and do PGD while projecting $z$ onto the convex set.
 
@@ -501,22 +456,22 @@ In practice, restrict $z$ to a convex set with efficient projections (closed for
 
 Construct a classifier \textbf{g} from a classifier \textbf{f} s.t. \textbf{g} has certain statistical robustness guarantees.
 
-Given base classifier $f: \mathbb{R}^d \rightarrow \mathcal{Y}$, construct smoothed classifier $g$ (where \hl{$\epsilon \sim \mathcal{N}(, \sigma^2 \mathbf{I})$}):
+Given base classifier $f: \mathbb{R}^d \rightarrow \mathcal{Y}$, construct smoothed classifier $g$ (where {$\epsilon \sim \mathcal{N}(, \sigma^2 \mathbf{I})$}):
 
 $g(x) := \arg \max_{c \in \mathcal{Y}} \mathbb{P}_\epsilon (f(x + \epsilon) = c)$
 
 \vspace*{1mm}
 \textbf{Robustness Guarantee:} suppose $c_A \in \mathcal{Y}$ (most likely class), $\underline{p_A}, \overline{p_B} \in [0,1]$ satisfy:
 
-\mhl{$\mathbb{P}_\epsilon(f(x + \epsilon) = c_A) \geq \underline{p_A} \geq \overline{p_B} \geq$}
+$\mathbb{P}_\epsilon(f(x + \epsilon) = c_A) \geq \underline{p_A} \geq \overline{p_B} \geq$
 
-\mhl{$\geq \max\limits_{c \neq c_A} \mathbb{P}_\epsilon (f(x + \epsilon) = c)$}
+$\geq \max\limits_{c \neq c_A} \mathbb{P}_\epsilon (f(x + \epsilon) = c)$
 
 with $\underline{p_A}$ a lower bound on the true highest probability and $\overline{p_B}$ an upper bound on the true second highest probability. In practice, get bounds via sampling which gives statistical guarantees.
 
-Then: \hl{$g(x + \delta) = c_A$, for all $||\delta||_2 < R$}, 
+Then: {$g(x + \delta) = c_A$, for all $||\delta||_2 < R$}, 
 
-\mhl{$R := \frac{\sigma}{2}(\phi^{-1}(\underline{p_A}) - \phi^{-1}(\overline{p_B})) \geq 0$} with $\phi^{-1}$ the inverse Gaussian CDF. Certified radius $R$ depends on input $x$ since $\underline{p_A}, \overline{p_B}$ depend on $x$.
+$R := \frac{\sigma}{2}(\phi^{-1}(\underline{p_A}) - \phi^{-1}(\overline{p_B})) \geq 0$ with $\phi^{-1}$ the inverse Gaussian CDF. Certified radius $R$ depends on input $x$ since $\underline{p_A}, \overline{p_B}$ depend on $x$.
 
 \vspace*{1mm}
 \textbf{Notes on CDF:} If $x \sim \mathcal{N}(0,1)$, $p \in [0,1]$, then $\phi^{-1}(p) = \nu$ s.t. $\mathbb{P}_x (x \leq \nu) = p$. $\phi^{-1}$ is monotone, i.e. for $\underline{p_A} \geq \overline{p_B}$, $\phi^{-1}(\underline{p_A}) \geq \phi^{-1}(\overline{p_B})$.
@@ -547,7 +502,7 @@ $\phi^{-1}(p) = -\phi^{-1}(1-p), p \in [0,1]$
 
 \textbf{Notes:}
 
-- \mhl{$\hat{c}_A$ is not necessarily the correct test set label}\\
+- $\hat{c}_A$ is not necessarily the correct test set label\\
 - Sample 2$\times$ ($n \gg n_0$) to prevent selection bias.\\
 - SampleUnderNoise evaluates $f$ at $x + \epsilon_i$ for $i \in \{1,..,n\}$, returns dict of class counts.\\
 - LowerConfBound returns probability $p_l$ s.t. $p_l \leq p$ with probability $1 - \alpha$, assuming $k \sim Binomial(n,p)$ for unknown $p$.\\
@@ -592,7 +547,78 @@ where $\epsilon \sim \mathcal{N}(0, \sigma^2\mathbf{I})$ and requiring compositi
 \fi
 
 
+\section{Individual Fairness}
+
+\subsection{Enforcing Fairness in Training}
+
+$\phi(x, x') \equiv x \sim x'$
+$\phi(x, x') \Rightarrow M(x) = M(x')$ by some defn. of $\phi$
+
+Goal:
+
+$\max E_{x \sim D}[\forall x' \in S_{\phi}(x): \mu(M(x), M(x')]$, where
+$M = h_\psi \circ f_\theta$.
+Constraint on $f_\theta$:
+$\psi(x, x') \Rightarrow || f_\theta(x) - f_\theta(x') || \leq \delta$,
+Train using DL2\&PGD:
+$x^{\star} = \argmin_{x' \in S_\phi(x)} L(\lnot(\phi \Rightarrow \omega))(x, x')$
+
+\subsection{Certifying Fairness}
+
+Certificate:
+Let $z = f\theta(x)$, $S_\phi(x) = \{ x' \in \mathbb{R}^d \ | \ \phi(x, x') \}$
+and $\epsilon = \max_{x' \in S_\phi(x)} || z - f_\theta(x') ||_{\infty}$. Then
+$\forall y \ . \ y \neq y = M(x), \max_{x' \in {\mathbb{B}_\infty(z, \epsilon)}} h^{(y')}_\psi(z') - h^{(y)}_\psi(z') < 0 \Rightarrow \forall x' \in S_\phi(x), \ M(x) = M(x')$
+
+
+\section{Federated Learning}
+
+\subsection{Training}
+
+Private $\{ x_i^k, y_i^k \} \sim \mathcal{D}$
+
+\textbf{FedSGD}: $g_k \leftarrow \nabla_{\Theta_t} \mathcal{L}(f_{\Theta_t}(x_i^k), y_i^k)$
+
+Aggregate:
+$g_c \leftarrow \frac{1}{K} \sum_{k=1}^K g_k$
+$\Theta_{t+1} \leftarrow \Theta_t - \gamma g_c$
+
+\textbf{FedAvg}: for each local epoch $i$,
+$\Theta_{t+1}^k \leftarrow \Theta_{t+1}^k - \gamma \nabla_{\Theta_t}
+\mathcal{L}(f_{\Theta_t}(x_i^k), y_i^k)$
+
+Aggregate: $\Theta_{t+1} \rightarrow \sum_{k=1}^K \frac{n_k}{n}
+\Theta_{t+1}^k$
+
+\subsection{Attacks}
+
+Gradient inversion,
+find $(x_i^\star, y_i^\star)$:
+
+$g(\nabla_{\Theta}
+\mathcal{L}(f_{\Theta}(x_i), y_i), f_\Theta) =
+\argmin_{(x_i^\star, y_i^\star)} || \nabla_{\Theta}
+\mathcal{L}(f_{\Theta}(x_i), y_i) -
+\nabla_{\Theta}
+\mathcal{L}(f_{\Theta}(x_i^\star), y_i^\star) ||_p
++ \mathcal{R}(x_i^\star)$
+
+\subsection{Differential Privacy}
+
+$\text{Pr}[M[\mathcal{D}] \in \mathcal{S}] \leq \exp [\epsilon]
+\text{Pr}[M[\mathcal{D}'] \in \mathcal{S}] + \delta$
+
+\textbf{DP-SGD}: clip gradients of clients and add noise
+
+$g_k = \min (\frac{C}{|| \nabla_{\Theta}
+\mathcal{L}(f_{\Theta}(x_i), y_i) ||}, 1) \cdot
+\nabla_{\Theta} \mathcal{L}(f_{\Theta}(x_i), y_i) +
+\epsilon_i$ with $\epsilon_i \sim \mathcal{N}(0, \sigma^2 C^2 I)$
+
+
 \section{Appendix}
+
+\textbf{Impl.}: $\phi \Rightarrow \psi = \lnot \phi \lor \psi$
 
 \textbf{DM}: $\lnot(\phi \land \psi) = \lnot \phi \lor \lnot \psi$;
 $\lnot(\phi \lor \psi) = \lnot \phi \land \lnot \psi$
@@ -609,7 +635,7 @@ $\mathbb{B}_\epsilon^2 \subseteq \mathbb{B}_{\epsilon \cdot \sqrt{d}}^1$
 
 $g$ concave (e.g. $\log$): $g(E[X]) \geq E[g(X)]$
 
-Bayes: \mhl{$P(X|Y) = \frac{P(X,Y)}{P(Y)} = \frac{P(Y|X)P(X)}{P(Y)}$}
+Bayes: $P(X|Y) = \frac{P(X,Y)}{P(Y)} = \frac{P(Y|X)P(X)}{P(Y)}$
 
 \textbf{Inv:} $A^{-1}=
 \big[

@@ -24,6 +24,8 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+\newcommand{\indep}{\perp \!\!\! \perp}
+
 \setdefaultleftmargin{0.5cm}{}{}{}{}{}
 
 \let\bar\overline
@@ -102,11 +104,7 @@ I do not guarantee correctness or completeness, nor is this document endorsed by
 $||x||_p = \big( \sum_{i=1}^d |x_i|^p \big)^{\frac{1}{p}}$ \quad $||x||_\infty = \max\limits_{i \in \{1,..,d\}} |x_i|$
 
 \vspace*{-1mm}
-\textbf{Softmax} $\sigma(z)_i = e^{z_i} / \sum_{j=1}^{D} e^{z_j}$
-
 \textbf{CE loss:} $CE(\vec{z}, y) = - \sum_{c=1}^{K} \mathbbm{1}[c = y] \cdot \log z_c$
-
-\textbf{Implication:} $\phi \implies \psi \Longleftrightarrow \lnot \phi \lor \psi$
 
 \textbf{Mean value:} $f(y) = f(x) + \nabla f(z)^T(y - x)$
 
@@ -128,7 +126,7 @@ $t(x) = f'(t) \cdot x + f(t) - f'(t) \cdot t$
 
 \subsection{Abstract Interpretation}
 
-Symbolic shape $z$ semantically represents a set of concrete values $x = \gamma(z)$. Concretization $\gamma$: defines the concrete values an abstract element $z$ represents. Concrete transformer $F(\cdot)$ ($F(x)$ generally uncomputable), abstract transformer $F^\#(\cdot)$, $F^\#(z)$ applies abstract transformer to $z$. Soundness: $F^\#$ needs to over-approximate $F$: {$\gamma(F^\#(z)) \supseteq F(x) = F(\gamma(z))$}
+Symbolic shape $z$ semantically represents a set of concrete values $x = \gamma(z)$. Concretization $\gamma$: defines the concrete values an abstract element $z$ represents. Concrete transformer $F(\cdot)$ ($F(x)$ generally uncomputable), abstract transformer $F^\#$, $F^\#(z)$ applies abstract transformer to $z$.
 
 $F^\#$ soundness: $\forall z: F(\gamma(z)) \subseteq \gamma(F^\#(z))$
 
@@ -284,7 +282,7 @@ Encode NN as MILP instance.\\
 
 $\rho(\theta) = \mathbb{E}_{(x,y) \sim D} \big[ \max\limits_{\textcolor{red}{z \in \gamma(NN^\#(S(x)))}} L(\theta, \textcolor{red}{z}, y) \big]$
 
-Find output $z$ in concretization $\gamma(NN^\#(S(x)))$ of abstract NN output $NN^\#(S(x))$ that maximizes loss $L$. Can use any abstract transformer (Box, Zonotope, DeepPoly,...). {Essentially automatic differentiation of abstract interpretation.}
+Find output $z$ in concretization $\gamma(NN^\#(S(x)))$ of abstract NN output $NN^\#(S(x))$ that maximizes loss $L$. Can use any abstract transformer (Box, Zonotope, DeepPoly,...). {Essentially auto-differentiation of abstract interpretation.}
 
 To find max loss, use abstract loss $L^\#(\vec{z}, y)$, where $y = $ target label, $\vec{z} = $ vector of logits:
 \vspace*{1mm}
@@ -503,7 +501,7 @@ $\phi^{-1}(p) = -\phi^{-1}(1-p), p \in [0,1]$
 \textbf{Notes:}
 
 - $\hat{c}_A$ is not necessarily the correct test set label\\
-- Sample 2$\times$ ($n \gg n_0$) to prevent selection bias.\\
+- Sample 2$\times$ ($n \gg n_0$): prevents selection bias.\\
 - SampleUnderNoise evaluates $f$ at $x + \epsilon_i$ for $i \in \{1,..,n\}$, returns dict of class counts.\\
 - LowerConfBound returns probability $p_l$ s.t. $p_l \leq p$ with probability $1 - \alpha$, assuming $k \sim Binomial(n,p)$ for unknown $p$.\\
 - $\underline{p_A} > \frac{1}{2}$ ensures $\overline{p_B} < \frac{1}{2}$, thus $\underline{p_A} \leq \overline{p_B}$\\
@@ -547,9 +545,9 @@ where $\epsilon \sim \mathcal{N}(0, \sigma^2\mathbf{I})$ and requiring compositi
 \fi
 
 
-\section{Individual Fairness}
+\section{Fairness}
 
-\subsection{Enforcing Fairness in Training}
+\subsection{Enforcing Individual Fairness in Training}
 
 $\phi(x, x') \equiv x \sim x'$
 $\phi(x, x') \Rightarrow M(x) = M(x')$ by some defn. of $\phi$
@@ -569,6 +567,16 @@ Certificate:
 Let $z = f\theta(x)$, $S_\phi(x) = \{ x' \in \mathbb{R}^d \ | \ \phi(x, x') \}$
 and $\epsilon = \max_{x' \in S_\phi(x)} || z - f_\theta(x') ||_{\infty}$. Then
 $\forall y \ . \ y \neq y = M(x), \max_{x' \in {\mathbb{B}_\infty(z, \epsilon)}} h^{(y')}_\psi(z') - h^{(y)}_\psi(z') < 0 \Rightarrow \forall x' \in S_\phi(x), \ M(x) = M(x')$
+
+\subsection{Group Fairness}
+
+Data $\mathcal{D} \in \mathcal{P}({\mathcal{X} \times \mathcal{A} \times \mathcal{Y}})$, classifier $h: \mathcal{X} \rightarrow \mathcal{Y}$
+
+Equalized odds: $h(X) \indep A | Y$
+
+Equality of opportunity: $h(X) \indep A | Y=1$
+
+Fairness deviation: $\mathcal{D}^{EOp}(h) = | \mathbb{P}(h(X)=1 | A=0, Y=1) - \mathbb{P}(h(X)=1 | A=1, Y=1) |$
 
 
 \section{Federated Learning}
@@ -608,7 +616,7 @@ $g(\nabla_{\Theta}
 $\text{Pr}[M[\mathcal{D}] \in \mathcal{S}] \leq \exp [\epsilon]
 \text{Pr}[M[\mathcal{D}'] \in \mathcal{S}] + \delta$
 
-\textbf{DP-SGD}: clip gradients of clients and add noise
+\textbf{DP-SGD}: clip clients gradients and add noise
 
 $g_k = \min (\frac{C}{|| \nabla_{\Theta}
 \mathcal{L}(f_{\Theta}(x_i), y_i) ||}, 1) \cdot
@@ -617,11 +625,6 @@ $g_k = \min (\frac{C}{|| \nabla_{\Theta}
 
 
 \section{Appendix}
-
-\textbf{Impl.}: $\phi \Rightarrow \psi = \lnot \phi \lor \psi$
-
-\textbf{DM}: $\lnot(\phi \land \psi) = \lnot \phi \lor \lnot \psi$;
-$\lnot(\phi \lor \psi) = \lnot \phi \land \lnot \psi$
 
 \textbf{Normballs}: $\mathbb{B}_\epsilon^1 \subseteq \mathbb{B}_\epsilon^2 \subseteq \mathbb{B}_\epsilon^\infty$
 \quad
